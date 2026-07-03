@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  ::selection {
+    background-color: rgba(255, 62, 0, 0.3);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid theme("colors.signal.DEFAULT");
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* Flat, bordered "paper" card — replaces the old glassmorphism with the
+     sharp, no-blur surface this editorial/brutalist look calls for. */
+  .panel {
+    background: theme("colors.void.surface");
+    border: 1px solid theme("colors.void.line");
+  }
+
+  .eyebrow {
+    @apply font-mono text-xs uppercase tracking-[0.25em] text-signal/80;
+  }
+
+  .tech-tag {
+    @apply font-mono text-[11px] uppercase tracking-wide text-mist
+      bg-void-surface px-2 py-1 border border-void-line;
+  }
+
+  /* Oversized, heavy editorial display type — the core visual signature
+     of this look. Sized down slightly from the reference's clamp(8rem,
+     20vw, 24rem) for legibility, but kept dramatically large. */
+  .huge-type {
+    font-family: "Syne", sans-serif;
+    font-weight: 800;
+    font-size: clamp(3rem, 12vw, 9rem);
+    line-height: 0.85;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+  }
+
+  /* Hollow / stroked text — used as a quieter secondary line under a
+     solid huge-type headline, or inside the marquee. */
+  .outline-text {
+    -webkit-text-stroke: 1px theme("colors.paper");
+    color: transparent;
+    opacity: 0.2;
+  }
+
+  .btn-solid {
+    @apply inline-block bg-signal text-paper font-mono text-sm uppercase tracking-wide
+      px-7 py-3 hover:bg-signal-dim transition-colors;
+  }
+
+  .btn-outline {
+    @apply inline-block border border-void-line text-paper font-mono text-sm uppercase tracking-wide
+      px-7 py-3 hover:border-signal transition-colors;
+  }
+}
+
+@layer utilities {
+  /* Grayscale-by-default imagery that blooms into color on hover —
+     the reference's signature project-image treatment. */
+  .img-grayscale-hover {
+    filter: grayscale(1);
+    transition: filter 0.5s ease;
+  }
+  .group:hover .img-grayscale-hover {
+    filter: grayscale(0);
+  }
+}
+
+/* Mouse-follow ambient glow — purely decorative, disabled on touch
+   devices and for anyone who's asked for reduced motion. */
+.cursor-blob {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(255, 62, 0, 0.16) 0%, rgba(14, 14, 14, 0) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  will-change: transform;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .cursor-blob {
+    display: none;
+  }
+}
+
+/* Continuous scrolling marquee strip */
+.marquee-track {
+  display: inline-flex;
+  white-space: nowrap;
+  width: max-content;
+}
