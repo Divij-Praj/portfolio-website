@@ -8,6 +8,7 @@ import ContainerScroll from "../components/ContainerScroll.jsx";
 import CodeTyper from "../components/CodeTyper.jsx";
 import ProjectCard from "../components/ProjectCard.jsx";
 import Reveal from "../components/Reveal.jsx";
+import OoyeSection from "../components/OoyeSection.jsx";
 import { fetchProjects } from "../services/api.js";
 
 export default function Home() {
@@ -72,6 +73,8 @@ export default function Home() {
           </motion.div>
         )}
       </section>
+      {/* DIVIJ -> OOYE scroll handoff */}
+      <OoyeSection />
     </>
   );
 }
