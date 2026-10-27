@@ -1,0 +1,266 @@
+import { useRef } from "react";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useReducedMotion,
+} from "framer-motion";
+
+/**
+ * Where the OOYE site lives. Change this one line if the public URL differs
+ * (e.g. a custom domain). The Vercel dashboard link is private; this must be
+ * the public deployment URL.
+ */
+const OOYE_URL = "https://ooye-site.vercel.app";
+const PORTFOLIO_X_URL =
+  "https://portfolio-xray-appj94ytsb3tj42ad8ab6z7.streamlit.app/";
+
+const GLOBE_CSS = `
+.ooye-globe{background-image:radial-gradient(rgba(183,220,195,.55) 1px,transparent 1.6px);background-size:14px 14px;-webkit-mask-image:radial-gradient(circle,#000 55%,transparent 71%);mask-image:radial-gradient(circle,#000 55%,transparent 71%);opacity:.35;animation:ooye-drift 40s linear infinite}
+@keyframes ooye-drift{from{background-position:0 0}to{background-position:140px 0}}
+`;
+
+const FROM = "DIVIJ".split("");
+const TO = "OOYE".split("");
+
+const FACTS = [
+  { k: "Live markets", v: "Nifty, Sensex, FX and crypto via a Yahoo Finance serverless proxy" },
+  { k: "Particle globe", v: "A Three.js globe that lights up with the day/night line" },
+  { k: "Portfolio X-Ray", v: "XIRR, FIFO tax lots, fund overlap and stress tests for Indian investors" },
+];
+
+/**
+ * Scroll-driven handoff from DIVIJ to OOYE: the ember-on-black portfolio
+ * dissolves, letter by letter, into OOYE's dark-green / sage world, then
+ * the project details rise in underneath.
+ */
+export default function OoyeSection() {
+  const ref = useRef(null);
+  const reduce = useReducedMotion();
+
+  const { scrollYProgress: p } = useScroll({
+    target: ref,
+    offset: ["start start", "end end"],
+  });
+
+  // World change: portfolio black -> OOYE deep green
+  const bg = useTransform(p, [0.1, 0.5], ["#0E0E0E", "#040906"]);
+  const glow = useTransform(p, [0.2, 0.55], [0, 1]);
+  const emberGlow = useTransform(p, [0, 0.3], [1, 0]);
+
+  // The big word shrinks upward to make room for the details
+  const wordScale = useTransform(p, [0.62, 0.85], [1, 0.46]);
+  const wordY = useTransform(p, [0.62, 0.85], ["0vh", "-24vh"]);
+
+  // Details
+  const detailsOpacity = useTransform(p, [0.7, 0.88], [0, 1]);
+  const detailsY = useTransform(p, [0.7, 0.88], [40, 0]);
+  const hintOpacity = useTransform(p, [0, 0.08], [1, 0]);
+
+  if (reduce) {
+    return (
+      <section className="bg-[#040906] px-6 py-28">
+        <Details static />
+      </section>
+    );
+  }
+
+  return (
+    <section ref={ref} className="relative h-[360vh]" aria-label="OOYE">
+      <style>{GLOBE_CSS}</style>
+      <motion.div
+        style={{ backgroundColor: bg }}
+        className="sticky top-0 h-screen overflow-hidden"
+      >
+        {/* ember glow (portfolio world) fading out */}
+        <motion.div
+          aria-hidden
+          style={{ opacity: emberGlow }}
+          className="absolute inset-0"
+        >
+          <div
+            className="absolute left-1/2 top-1/2 h-[70vmin] w-[70vmin] -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(255,62,0,0.18) 0%, rgba(14,14,14,0) 70%)",
+            }}
+          />
+        </motion.div>
+
+        {/* green glow + dotted globe (OOYE world) fading in */}
+        <motion.div
+          aria-hidden
+          style={{ opacity: glow }}
+          className="absolute inset-0"
+        >
+          <div
+            className="absolute left-1/2 top-1/2 h-[90vmin] w-[90vmin] -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(90,179,128,0.22) 0%, rgba(4,9,6,0) 68%)",
+            }}
+          />
+          <div
+            className="ooye-globe absolute left-1/2 top-1/2 h-[64vmin] w-[64vmin] -translate-x-1/2 -translate-y-1/2 rounded-full"
+          />
+        </motion.div>
+
+        {/* the word: DIVIJ letters out, OOYE letters in */}
+        <motion.div
+          style={{ scale: wordScale, y: wordY }}
+          className="absolute inset-0 flex items-center justify-center"
+        >
+          <div className="relative">
+            {/* invisible sizer keeps the box stable */}
+            <span
+              aria-hidden
+              className="huge-type invisible whitespace-pre"
+              style={{ fontSize: "clamp(4.5rem, 24vw, 17rem)" }}
+            >
+              {"DIVIJ"}
+            </span>
+
+            <div className="absolute inset-0 flex items-center justify-center">
+              {FROM.map((c, i) => (
+                <FromLetter key={i} c={c} i={i} p={p} />
+              ))}
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              {TO.map((c, i) => (
+                <ToLetter key={i} c={c} i={i} p={p} />
+              ))}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* scroll hint */}
+        <motion.p
+          style={{ opacity: hintOpacity }}
+          className="absolute bottom-10 left-0 right-0 text-center font-mono text-xs uppercase tracking-[0.3em] text-mist-dim"
+        >
+          Keep scrolling
+        </motion.p>
+
+        {/* details */}
+        <motion.div
+          style={{ opacity: detailsOpacity, y: detailsY }}
+          className="absolute inset-x-0 bottom-0 flex justify-center px-6 pb-10 md:pb-14"
+        >
+          <Details />
+        </motion.div>
+      </motion.div>
+    </section>
+  );
+}
+
+function FromLetter({ c, i, p }) {
+  const start = 0.18 + i * 0.045;
+  const opacity = useTransform(p, [start, start + 0.14], [1, 0]);
+  const y = useTransform(p, [start, start + 0.14], [0, -70]);
+  const blur = useTransform(p, [start, start + 0.14], [0, 14]);
+  const filter = useTransform(blur, (b) => `blur(${b}px)`);
+  const color = "#FFFFFF";
+  return (
+    <motion.span
+      style={{
+        opacity,
+        y,
+        filter,
+        fontSize: "clamp(4.5rem, 24vw, 17rem)",
+        color,
+      }}
+      className="huge-type inline-block"
+    >
+      {c}
+    </motion.span>
+  );
+}
+
+function ToLetter({ c, i, p }) {
+  const start = 0.34 + i * 0.05;
+  const opacity = useTransform(p, [start, start + 0.14], [0, 1]);
+  const y = useTransform(p, [start, start + 0.14], [70, 0]);
+  const blur = useTransform(p, [start, start + 0.14], [14, 0]);
+  const filter = useTransform(blur, (b) => `blur(${b}px)`);
+  return (
+    <motion.span
+      style={{
+        opacity,
+        y,
+        filter,
+        fontSize: "clamp(4.5rem, 24vw, 17rem)",
+        color: "#B7DCC3",
+        textShadow: "0 0 60px rgba(90,179,128,0.35)",
+      }}
+      className="huge-type inline-block"
+    >
+      {c}
+    </motion.span>
+  );
+}
+
+function Details({ static: isStatic = false }) {
+  return (
+    <div className="w-full max-w-5xl">
+      {isStatic && (
+        <h2
+          className="huge-type mb-10 text-center"
+          style={{ fontSize: "clamp(4rem, 18vw, 10rem)", color: "#B7DCC3" }}
+        >
+          OOYE
+        </h2>
+      )}
+      <p
+        className="mb-3 font-mono text-xs uppercase tracking-[0.25em]"
+        style={{ color: "#5AB380" }}
+      >
+        Now building / Finance board
+      </p>
+      <div className="grid gap-8 md:grid-cols-[1.3fr_1fr] md:items-end">
+        <div>
+          <p className="max-w-xl text-base leading-relaxed text-[#B7DCC3]/80 md:text-lg">
+            OOYE is a one-stop finance board, a finance Jarvis named for the
+            reaction you have when you see your real numbers. Live global
+            markets sit next to a rotating particle globe, and Portfolio
+            X-Ray is its first module. More are on the way.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <a
+              href={OOYE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block px-7 py-3 font-mono text-sm uppercase tracking-wide text-[#040906] transition-opacity hover:opacity-85"
+              style={{ backgroundColor: "#B7DCC3" }}
+            >
+              Enter OOYE ↗
+            </a>
+            <a
+              href={PORTFOLIO_X_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block border px-7 py-3 font-mono text-sm uppercase tracking-wide text-[#B7DCC3] transition-colors hover:border-[#B7DCC3]"
+              style={{ borderColor: "rgba(90,179,128,0.5)" }}
+            >
+              Portfolio X-Ray ↗
+            </a>
+          </div>
+        </div>
+
+        <ul className="hidden space-y-3 md:block">
+          {FACTS.map((f) => (
+            <li
+              key={f.k}
+              className="border-l-2 pl-4"
+              style={{ borderColor: "#5AB380" }}
+            >
+              <span className="block font-mono text-[11px] uppercase tracking-widest text-[#B7DCC3]">
+                {f.k}
+              </span>
+              <span className="text-sm text-[#B7DCC3]/60">{f.v}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
