@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import ProjectCard from "../components/ProjectCard.jsx";
 import Reveal from "../components/Reveal.jsx";
+import ArchiveHighlights from "../components/ArchiveHighlights.jsx";
 import { fetchProjects } from "../services/api.js";
 
 export default function Projects() {
@@ -29,6 +30,8 @@ export default function Projects() {
           Archive
         </h1>
       </Reveal>
+
+      <ArchiveHighlights />
 
       {status === "loading" && (
         <p className="text-mist-dim font-mono text-sm">Fetching projects…</p>

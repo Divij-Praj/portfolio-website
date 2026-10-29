@@ -6,14 +6,7 @@ import {
   useReducedMotion,
 } from "framer-motion";
 
-/**
- * Where the OOYE site lives. Change this one line if the public URL differs
- * (e.g. a custom domain). The Vercel dashboard link is private; this must be
- * the public deployment URL.
- */
-const OOYE_URL = "https://ooye-site.vercel.app";
-const PORTFOLIO_X_URL =
-  "https://portfolio-xray-appj94ytsb3tj42ad8ab6z7.streamlit.app/";
+import { OOYE_URL } from "../lib/links.js";
 
 const GLOBE_CSS = `
 .ooye-globe{background-image:radial-gradient(rgba(183,220,195,.55) 1px,transparent 1.6px);background-size:14px 14px;-webkit-mask-image:radial-gradient(circle,#000 55%,transparent 71%);mask-image:radial-gradient(circle,#000 55%,transparent 71%);opacity:.35;animation:ooye-drift 40s linear infinite}
@@ -26,7 +19,7 @@ const TO = "OOYE".split("");
 const FACTS = [
   { k: "Live markets", v: "Nifty, Sensex, FX and crypto via a Yahoo Finance serverless proxy" },
   { k: "Particle globe", v: "A Three.js globe that lights up with the day/night line" },
-  { k: "Portfolio X-Ray", v: "XIRR, FIFO tax lots, fund overlap and stress tests for Indian investors" },
+  { k: "Built-in analyzer", v: "XIRR, FIFO tax lots, fund overlap and stress tests for Indian investors" },
 ];
 
 /**
@@ -221,8 +214,8 @@ function Details({ static: isStatic = false }) {
           <p className="max-w-xl text-base leading-relaxed text-[#B7DCC3]/80 md:text-lg">
             OOYE is a one-stop finance board, a finance Jarvis named for the
             reaction you have when you see your real numbers. Live global
-            markets sit next to a rotating particle globe, and Portfolio
-            X-Ray is its first module. More are on the way.
+            markets sit next to a rotating particle globe, with a full
+            portfolio analyzer built right in. More modules are on the way.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <a
@@ -233,15 +226,6 @@ function Details({ static: isStatic = false }) {
               style={{ backgroundColor: "#B7DCC3" }}
             >
               Enter OOYE ↗
-            </a>
-            <a
-              href={PORTFOLIO_X_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block border px-7 py-3 font-mono text-sm uppercase tracking-wide text-[#B7DCC3] transition-colors hover:border-[#B7DCC3]"
-              style={{ borderColor: "rgba(90,179,128,0.5)" }}
-            >
-              Portfolio X-Ray ↗
             </a>
           </div>
         </div>
